@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roll The Dice</title>
+    <!--Google Font-->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <!--Stylesheet-->
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(
+                #000000,
+                #024D07
+            ) 0 100% no-repeat;
+            background-size: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 0 15px 25px rgba(50, 50, 50, 0.15);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: "Poppins", sans-serif;
+        }
+
+        .dice-wrapper {
+            width: 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .dice-wrapper img {
+            width: 80px;
+            height: 80px;
+            margin: 5px;
+            transform-origin: center;
+            transition: transform 1s ease-in-out, filter 1s ease-in-out;
+        }
+
+        .roll-animation {
+            animation: rollAnimation 1s linear infinite;
+        }
+
+        @keyframes rollAnimation {
+            0% {
+                transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+                filter: hue-rotate(0deg);
+            }
+            25% {
+                transform: rotateX(720deg) rotateY(180deg) rotateZ(720deg);
+                filter: hue-rotate(90deg);
+            }
+            50% {
+                transform: rotateX(1440deg) rotateY(360deg) rotateZ(1440deg);
+                filter: hue-rotate(180deg);
+            }
+            75% {
+                transform: rotateX(2160deg) rotateY(540deg) rotateZ(2160deg);
+                filter: hue-rotate(270deg);
+            }
+            100% {
+                transform: rotateX(2880deg) rotateY(720deg) rotateZ(2880deg);
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        label {
+            margin-top: 15px;
+        }
+
+        button {
+            background-color: #196F3D;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            padding: 15px 0;
+            width: 150px;
+            letter-spacing: 1px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .shake {
+            animation: shake 2s infinite;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: rotate(8deg);
+            }
+            50% {
+                transform: rotate(-8deg);
+            }
+            100% {
+                transform: rotate(8deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dice-wrapper">
+            <img id="die-1">
+        </div>
+        <label for="numDices">Number of dices (up to 5):</label>
+        <input type="number" id="numDices" min="1" max="5" value="1">
+        <button onclick="roll()">ROLL THE DICE</button>
+        <p id="note">Upto 1 dice</p>
+    </div>
+    <!--Script-->
+    <script>
+        let images = ["https://raw.githubusercontent.com/trickster666/svgs/1fa5d6b75e0f38055018395be6779a53f34b9544/dice-01.svg", "https://raw.githubusercontent.com/trickster666/svgs/1fa5d6b75e0f38055018395be6779a53f34b9544/dice-02.svg", "https://raw.githubusercontent.com/trickster666/svgs/1fa5d6b75e0f38055018395be6779a53f34b9544/dice-03.svg", "https://raw.githubusercontent.com/trickster666/svgs/1fa5d6b75e0f38055018395be6779a53f34b9544/dice-04.svg", "https://raw.githubusercontent.com/trickster666/svgs/1fa5d6b75e0f38055018395be6779a53f34b9544/dice-05.svg", "https://raw.githubusercontent.com/trickster666/svgs/1fa5d6b75e0f38055018395be6779a53f34b9544/dice-06.svg"];
+        let diceContainer = document.querySelector(".dice-wrapper");
+        let note = document.querySelector("#note");
+
+        function roll() {
+            let numDices = document.querySelector("#numDices").value;
+            numDices = Math.min(Math.max(parseInt(numDices), 1), 5);
+
+            diceContainer.innerHTML = "";
+
+            let row1, row2;
+
+            if (numDices === 4) {
+                row1 = 3;
+                row2 = 1;
+            } else if (numDices === 5) {
+                row1 = 3;
+                row2 = 2;
+            } else {
+                row1 = numDices;
+                row2 = 0;
+            }
+
+            for (let i = 0; i < row1; i++) {
+                let die = document.createElement("img");
+                die.id = `die-${i + 1}`;
+                die.classList.add("shake", "roll-animation"); // Add roll-animation class
+                diceContainer.appendChild(die);
+            }
+
+            for (let i = 0; i < row2; i++) {
+                let die = document.createElement("img");
+                die.id = `die-${i + row1 + 1}`;
+                die.classList.add("shake", "roll-animation"); // Add roll-animation class
+                diceContainer.appendChild(die);
+            }
+
+            setTimeout(function () {
+                diceContainer.querySelectorAll("img").forEach(function (die) {
+                    die.classList.remove("shake");
+                    let dieValue = Math.floor(Math.random() * 6);
+                    die.setAttribute("src", images[dieValue]);
+                    let randomHue = Math.floor(Math.random() * 360);
+                    die.style.filter = `hue-rotate(${randomHue}deg)`;
+                    die.classList.remove("roll-animation"); // Remove roll-animation class after applying final values
+                });
+
+                note.innerHTML = ` ${numDices} dice${numDices > 1 ? 's' : ''}`;
+            }, 1000);
+        }
+
+        roll();
+    </script>
+</body>
+</html>
